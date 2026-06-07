@@ -272,7 +272,7 @@ footer {
 }
 
 .logo-espera {
-  width: 400px; 
+  width: min(600px, 80vw);
   height: auto;
   margin-bottom: 25px;
 }
