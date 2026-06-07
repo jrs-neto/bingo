@@ -9,6 +9,7 @@ const classes = ["b", "i", "n", "g", "o"];
 
 for (let linha = 0; linha < 5; linha++) {
   const letra = document.createElement("div");
+
   letra.className = `letra ${classes[linha]}`;
   letra.textContent = letras[linha];
 
@@ -23,26 +24,45 @@ for (let linha = 0; linha < 5; linha++) {
     div.textContent = numero;
 
     div.addEventListener("click", () => {
-      if (
-        div.classList.contains("marcado-b") ||
-        div.classList.contains("marcado-i") ||
-        div.classList.contains("marcado-n") ||
-        div.classList.contains("marcado-g") ||
-        div.classList.contains("marcado-o")
-      ) {
+      const classeMarcacao = `marcado-${classes[linha]}`;
+      const valor = `${letras[linha]}-${numero}`;
+
+      if (div.classList.contains(classeMarcacao)) {
+        const confirmar = confirm(
+          `Deseja realmente desmarcar o número ${valor}?\n\nEsta ação removerá o número do histórico.`,
+        );
+
+        if (!confirmar) {
+          return;
+        }
+
+        div.classList.remove(classeMarcacao);
+
+        const indice = historico.findIndex((item) => item.texto === valor);
+
+        if (indice !== -1) {
+          historico.splice(indice, 1);
+        }
+
+        atualizarHistorico();
+
+        if (historico.length > 0) {
+          ultimo.textContent = historico[0].texto;
+        } else {
+          ultimo.textContent = "--";
+        }
+
         return;
       }
 
-      div.classList.add(`marcado-${classes[linha]}`);
-
-      const valor = `${letras[linha]}-${numero}`;
-
-      ultimo.textContent = valor;
+      div.classList.add(classeMarcacao);
 
       historico.unshift({
         texto: valor,
         classe: classes[linha],
       });
+
+      ultimo.textContent = valor;
 
       atualizarHistorico();
     });
@@ -52,12 +72,17 @@ for (let linha = 0; linha < 5; linha++) {
 }
 
 function atualizarHistorico() {
+  if (historico.length === 0) {
+    lista.innerHTML = "Nenhum número sorteado.";
+    return;
+  }
+
   lista.innerHTML = "";
 
   historico.forEach((item) => {
     const span = document.createElement("span");
 
-    span.className = `item-historico ${item.classe}`;
+    span.className = "item-historico";
     span.textContent = item.texto;
 
     lista.appendChild(span);
@@ -65,7 +90,7 @@ function atualizarHistorico() {
 }
 
 function reiniciar() {
-  if (!confirm("Limpar todos os números?")) {
+  if (!confirm("Tem certeza que deseja iniciar um novo jogo?")) {
     return;
   }
 
